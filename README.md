@@ -1,1 +1,3 @@
 # polyback
+
+mvn jetty:run
