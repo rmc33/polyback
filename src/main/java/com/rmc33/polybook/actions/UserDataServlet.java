@@ -56,6 +56,12 @@ public class UserDataServlet extends HttpServlet {
         return;
     }
 
+    String userId = (String) req.getParameter("userId");
+    if (userId == null) {
+        resp.getWriter().write("no userId");
+        return;
+    }
+
     String userData = (String) req.getParameter("userData");
     if (userData == null) {
         resp.getWriter().write("no userData");
@@ -64,9 +70,12 @@ public class UserDataServlet extends HttpServlet {
 
     Map<String,Object> sessionData = null;
     try {
+        firestoreSesion.init();
         sessionData = firestoreSesion.loadSessionNum(sessionNum);
     } catch (Exception e) {
-        logger.info("error:" + e);
+        logger.info("firestoreSesion error:" + e);
+        resp.getWriter().write("could not set userdata");
+        return;
     }
 
     logger.info("sessionData:" + gson.toJson(sessionData));

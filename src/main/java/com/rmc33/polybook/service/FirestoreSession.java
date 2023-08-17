@@ -33,6 +33,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import com.google.cloud.firestore.DocumentReference;
 import java.util.logging.Logger;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -47,28 +48,31 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import com.google.auth.oauth2.GoogleCredentials;
 import java.io.FileInputStream;
+import com.google.api.core.ApiFuture;
+
+import com.google.cloud.firestore.WriteResult;
 
 public class FirestoreSession  {
   private static final SimpleDateFormat dtf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-  private static final Logger logger = Logger.getLogger(SessionServlet.class.getName());
+  private static final Logger logger = Logger.getLogger(FirestoreSession.class.getName());
   private static Firestore firestore;
   private static CollectionReference sessions;
 
   public FirestoreSession() {
-    init();
+
   }
 
-  public void init() {
-    try {
-    FileInputStream serviceAccount =
-        new FileInputStream("/Users/rc/workspace/polyback/serviceAccountKey.json");
+  public void init() throws InterruptedException, ExecutionException, java.io.IOException {
 
-       // Initialize local copy of datastore session variables.
-    firestore = FirestoreOptions.getDefaultInstance().toBuilder()
-        .setProjectId("strong-imagery-341902")
-        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-        .build().getService();
-    sessions = firestore.collection("sessions");
+      if (firestore == null) {
+        FileInputStream serviceAccount = 
+          new FileInputStream("/Users/rc/workspace/polyback/serviceAccountKey.json");
+        firestore = FirestoreOptions.getDefaultInstance().toBuilder()
+            .setProjectId("strong-imagery-341902")
+            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+            .build().getService();
+        sessions = firestore.collection("sessions");
+      }
 
       // Delete all sessions unmodified for over two days.
       Calendar cal = Calendar.getInstance();
@@ -80,44 +84,33 @@ public class FirestoreSession  {
       for (QueryDocumentSnapshot snapshot : sessionDocs.getDocuments()) {
         snapshot.getReference().delete();
       }
-    } catch (InterruptedException | ExecutionException e) {
-      logger.info(String.format("Exception initializing FirestoreSessionFilter: %s", e));
-    } catch (java.io.IOException ioe) {
-      logger.info(String.format("Firestore error: %s", ioe));
-    }
   }
 
   public String createSession(String userId)
-      throws IOException {
+      throws IOException, ExecutionException, InterruptedException {
 
     String sessionNum = new BigInteger(130, new SecureRandom()).toString(32);
+    Date today = Calendar.getInstance().getTime();
     Map<String, Object> sessionMap = new HashMap<>();
     sessionMap.put("sessionNum", sessionNum);
     sessionMap.put("userId", userId);
+    sessionMap.put("lastModified", dtf.format(today));
     logger.info("Saving data to " + sessionNum + " for userId:" + userId);
-    firestore.runTransaction((ob) -> sessions.document(sessionNum).set(sessionMap));
+    ApiFuture<WriteResult> future = sessions.document(sessionNum).set(sessionMap);
+    System.out.println("Update time : " + future.get().getUpdateTime());
     return sessionNum;
   }
 
 
   public Map<String, Object> loadSessionNum(String sessionNum)
       throws ExecutionException, InterruptedException {
-    Map<String, Object> datastoreMap = new HashMap<>();
-    if (sessionNum.equals("")) {
-      return datastoreMap;
-    }
 
-    return firestore
-        .runTransaction(
-            (ob) -> {
-              DocumentSnapshot session = sessions.document(sessionNum).get().get();
-              Map<String, Object> data = session.getData();
-              if (data == null) {
-                data = Maps.newHashMap();
-              }
-              return data;
-            })
-        .get();
+    DocumentSnapshot session = sessions.document(sessionNum).get().get();
+    Map<String, Object> data = session.getData();
+    if (data == null) {
+      data = Maps.newHashMap();
+    }
+    return data;
   }
 
 }
