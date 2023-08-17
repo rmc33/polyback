@@ -78,7 +78,8 @@ public class FirestoreSession  {
       Calendar cal = Calendar.getInstance();
       cal.setTime(new Date());
       cal.add(Calendar.HOUR, -48);
-      Date twoDaysAgo = Calendar.getInstance().getTime();
+      Date twoDaysAgo = cal.getTime();
+      logger.info("deleting data older than " + dtf.format(twoDaysAgo));
       QuerySnapshot sessionDocs =
           sessions.whereLessThan("lastModified", dtf.format(twoDaysAgo)).get().get();
       for (QueryDocumentSnapshot snapshot : sessionDocs.getDocuments()) {
