@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.rmc33.polybook.util;
+package com.rmc33.polybook.service;
 
 import com.rmc33.polybook.actions.SessionServlet;
 import com.google.cloud.firestore.CollectionReference;
@@ -99,13 +99,8 @@ public class FirestoreSession  {
     return sessionNum;
   }
 
-  /**
-   * Take an HttpServletRequest, and copy all of the current session variables over to it
-   *
-   * @param req Request from which to extract session.
-   * @return a map of strings containing all the session variables loaded or an empty map.
-   */
-  private Map<String, Object> loadSessionVariables(String sessionNum)
+
+  public Map<String, Object> loadSessionNum(String sessionNum)
       throws ExecutionException, InterruptedException {
     Map<String, Object> datastoreMap = new HashMap<>();
     if (sessionNum.equals("")) {

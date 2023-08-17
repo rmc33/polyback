@@ -24,23 +24,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.rmc33.polybook.util.FirestoreSession;
+import com.rmc33.polybook.models.SessionResponse;
+import com.rmc33.polybook.service.FirestoreSession;
+import com.google.gson.Gson;
 
 @WebServlet(
-    name = "helloworld",
-    urlPatterns = {"/"})
+    name = "SessionServlet",
+    urlPatterns = {"/session"})
 public class SessionServlet extends HttpServlet {
   private static final Logger logger = Logger.getLogger(SessionServlet.class.getName());
-  private static final FirestoreSession firestoreSesion = new FirestoreSession(); 
+  private static final FirestoreSession firestoreSesion = new FirestoreSession();
+  private static final Gson gson = new Gson();
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    if (!req.getServletPath().equals("/")) {
-      resp.getWriter().write("wrong path");
-      return;
-    }
-    // Get current values for the session.
-    // If any attribute doesn't exist, add it to the session.
+
     String userId = (String) req.getParameter("userId");
     if (userId == null) {
       resp.getWriter().write("no userId");
@@ -48,9 +46,11 @@ public class SessionServlet extends HttpServlet {
     }
 
     String sessionNum = firestoreSesion.createSession(userId);
+    SessionResponse sessionRespopnse = new SessionResponse();
+    sessionRespopnse.setSessionNum(sessionNum);
 
     logger.info("Writing response " + req.toString());
-    resp.getWriter().write(String.format("%s sessionId for %s", sessionNum, userId));
+    resp.getWriter().write(gson.toJson(sessionRespopnse));
   }
 
 
