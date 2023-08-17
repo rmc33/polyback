@@ -72,6 +72,10 @@ public class UserDataServlet extends HttpServlet {
     try {
         firestoreSesion.init();
         sessionData = firestoreSesion.loadSessionNum(sessionNum);
+        String sessionUserId = (String) sessionData.get("userId");
+        if (sessionUserId != null && sessionUserId.equals(userId)) {
+            //firestoreSesion.updateUserData(sessionUserId, userData);
+        }
     } catch (Exception e) {
         logger.info("firestoreSesion error:" + e);
         resp.getWriter().write("could not set userdata");

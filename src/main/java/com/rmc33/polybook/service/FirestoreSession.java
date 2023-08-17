@@ -98,7 +98,6 @@ public class FirestoreSession  {
     sessionMap.put("lastModified", dtf.format(today));
     logger.info("Saving data to " + sessionNum + " for userId:" + userId);
     ApiFuture<WriteResult> future = sessions.document(sessionNum).set(sessionMap);
-    System.out.println("Update time : " + future.get().getUpdateTime());
     return sessionNum;
   }
 
