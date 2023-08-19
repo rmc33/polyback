@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.rmc33.polybook.models.SessionResponse;
 import com.rmc33.polybook.service.FirestoreSession;
+import com.rmc33.polybook.service.AppleIDService;
+import com.rmc33.polybook.service.GoogleIDService;
+import com.rmc33.polybook.service.IDService;
 import com.google.gson.Gson;
 
 @WebServlet(
@@ -19,7 +22,7 @@ import com.google.gson.Gson;
     urlPatterns = {"/session"})
 public class SessionServlet extends HttpServlet {
   private static final Logger logger = Logger.getLogger(SessionServlet.class.getName());
-  private static final FirestoreSession firestoreSesion = new FirestoreSession();
+  private static final FirestoreSession firestoreSesion = FirestoreSession.getInstance();
   private static final Gson gson = new Gson();
 
 
@@ -57,8 +60,23 @@ public class SessionServlet extends HttpServlet {
     }
 
     String sessionNum = null;
+    IDService idService = null;
     try {
-        firestoreSesion.init();
+        if (provider.equals("apple")) {
+            idService = new AppleIDService();
+        }
+        else if (provider.equals("google")){
+            idService = new GoogleIDService();
+        }
+        else {
+            logger.info("invalid provider");
+            return;
+        }
+        boolean verifyResult = idService.verifyIDToken(auth, userId);
+        if (verifyResult == false) {
+            logger.info("id error");
+            return;
+        }
         sessionNum = firestoreSesion.createSession(userId);
     } catch (Exception e) {
         logger.info("firestoreSesion error:" + e);

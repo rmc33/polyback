@@ -36,6 +36,7 @@ import javax.servlet.http.HttpSession;
 import com.google.auth.oauth2.GoogleCredentials;
 import java.io.FileInputStream;
 import com.google.api.core.ApiFuture;
+import java.io.IOException;
 
 import com.google.cloud.firestore.WriteResult;
 
@@ -44,24 +45,36 @@ public class FirestoreSession  {
   private static final Logger logger = Logger.getLogger(FirestoreSession.class.getName());
   private static Firestore firestore;
   private static CollectionReference sessions;
+  private static FirestoreSession instance;
 
-  public FirestoreSession() {
+  private FirestoreSession() {
 
   }
 
-  public void init() throws InterruptedException, ExecutionException, java.io.IOException {
-
-      if (firestore == null) {
-        FileInputStream serviceAccount = 
-          new FileInputStream("/Users/rc/workspace/polyback/serviceAccountKey.json");
-        firestore = FirestoreOptions.getDefaultInstance().toBuilder()
-            .setProjectId("strong-imagery-341902")
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .build().getService();
-        sessions = firestore.collection("sessions");
+  public static FirestoreSession getInstance() {
+    if (instance == null) {
+      instance = new FirestoreSession();
+      try {
+        instance.init();
       }
+      catch(Exception e) {
+        logger.info("failed to create firesession instance: " + e);
+      }
+    }
+    return instance;
+  }
 
-      // Delete all sessions unmodified for over two days.
+  public void init() throws InterruptedException, ExecutionException, IOException {
+
+      FileInputStream serviceAccount = 
+        new FileInputStream("/Users/rc/workspace/polyback/serviceAccountKey.json");
+      firestore = FirestoreOptions.getDefaultInstance().toBuilder()
+          .setProjectId("strong-imagery-341902")
+          .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+          .build().getService();
+      sessions = firestore.collection("sessions");
+
+        // Delete all sessions unmodified for over two days.
       Calendar cal = Calendar.getInstance();
       cal.setTime(new Date());
       cal.add(Calendar.HOUR, -48);

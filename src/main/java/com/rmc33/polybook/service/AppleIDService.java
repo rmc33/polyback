@@ -9,18 +9,18 @@ import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver;
 
 
-public class AppleIDService  {
+public class AppleIDService implements IDService {
 
     private static final Logger logger = Logger.getLogger(AppleIDService.class.getName());
 
-    public boolean verifyIDToken(String idToken) {
+    public boolean verifyIDToken(String idToken, String userId) {
         HttpsJwks httpsJkws = new HttpsJwks("https://appleid.apple.com/auth/keys");
 
         HttpsJwksVerificationKeyResolver httpsJwksKeyResolver = new HttpsJwksVerificationKeyResolver(httpsJkws);
         JwtConsumer jwtConsumer = new JwtConsumerBuilder()
                 .setVerificationKeyResolver(httpsJwksKeyResolver)
                 .setExpectedIssuer("https://appleid.apple.com")
-                .setExpectedAudience("bibleLingo")
+                .setExpectedAudience("org.reactjs.native.example.BibleLingo")
                 .build();
         
         try {

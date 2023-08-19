@@ -9,17 +9,18 @@ import com.google.api.client.json.gson.GsonFactory;
 import java.util.logging.Logger;
 import java.util.Collections;
 
-public class GoogleIDService  {
+public class GoogleIDService  implements IDService {
 
     private static final Logger logger = Logger.getLogger(GoogleIDService.class.getName());
 
-    public boolean verifyIDToken(String idToken) {
+    public boolean verifyIDToken(String idToken, String userId) {
 
         JsonFactory jsonFactory = new GsonFactory();
         NetHttpTransport transport = new NetHttpTransport();
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
             // Specify the CLIENT_ID of the app that accesses the backend:
-            .setAudience(Collections.singletonList("bibleLingo"))
+            //https://console.cloud.google.com/apis/credentials/oauthclient/
+            .setAudience(Collections.singletonList("824870600508-f3hqh05m2kujcicp4iq916lpbr1ds84p.apps.googleusercontent.com"))
             // Or, if multiple clients access the backend:
             //.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
             .build();

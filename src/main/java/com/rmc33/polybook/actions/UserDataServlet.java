@@ -22,7 +22,7 @@ import java.util.Map;
     urlPatterns = {"/userdata"})
 public class UserDataServlet extends HttpServlet {
   private static final Logger logger = Logger.getLogger(UserDataServlet.class.getName());
-  private static final FirestoreSession firestoreSesion = new FirestoreSession();
+  private static final FirestoreSession firestoreSesion = FirestoreSession.getInstance();
   private static final Gson gson = new Gson();
 
   @Override
@@ -57,7 +57,6 @@ public class UserDataServlet extends HttpServlet {
 
     Map<String,Object> sessionData = null;
     try {
-        firestoreSesion.init();
         sessionData = firestoreSesion.loadSessionNum(sessionNum);
         String sessionUserId = (String) sessionData.get("userId");
         if (sessionUserId != null && sessionUserId.equals(userId)) {
