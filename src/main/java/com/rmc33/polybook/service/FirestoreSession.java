@@ -73,18 +73,6 @@ public class FirestoreSession  {
           .setCredentials(GoogleCredentials.fromStream(serviceAccount))
           .build().getService();
       sessions = firestore.collection("sessions");
-
-        // Delete all sessions unmodified for over two days.
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(new Date());
-      cal.add(Calendar.HOUR, -48);
-      Date twoDaysAgo = cal.getTime();
-      logger.info("deleting data older than " + dtf.format(twoDaysAgo));
-      QuerySnapshot sessionDocs =
-          sessions.whereLessThan("lastModified", dtf.format(twoDaysAgo)).get().get();
-      for (QueryDocumentSnapshot snapshot : sessionDocs.getDocuments()) {
-        snapshot.getReference().delete();
-      }
   }
 
   public String createSession(String userId)
