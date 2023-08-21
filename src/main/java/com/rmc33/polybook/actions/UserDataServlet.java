@@ -60,16 +60,18 @@ public class UserDataServlet extends HttpServlet {
         sessionData = firestoreSesion.loadSessionNum(sessionNum);
         String sessionUserId = (String) sessionData.get("userId");
         if (sessionUserId != null && sessionUserId.equals(userId)) {
-            //firestoreSesion.updateUserData(sessionUserId, userData);
+            firestoreSesion.updateUserData(sessionUserId, userData);
+        }
+        else {
+            logger.info("session invalid");
+            return;
         }
     } catch (Exception e) {
         logger.info("firestoreSesion error:" + e);
         resp.getWriter().write("could not set userdata");
         return;
     }
-
     logger.info("sessionData:" + gson.toJson(sessionData));
-
     UserDataResponse userDataResponse = new UserDataResponse();
     userDataResponse.setCode("success");
     resp.getWriter().write(gson.toJson(userDataResponse));

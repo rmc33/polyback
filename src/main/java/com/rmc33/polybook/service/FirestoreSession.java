@@ -101,4 +101,12 @@ public class FirestoreSession  {
     return data;
   }
 
+  public void updateUserData(String sessionUserId, String userData) {
+    Map<String, Object> data = new HashMap<>();
+    Date today = Calendar.getInstance().getTime();
+    data.put("userdata", userData);
+    data.put("lastModified", dtf.format(today));
+    firestore.collection("userdata").document(sessionUserId).set(data);
+  }
+
 }
