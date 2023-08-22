@@ -33,10 +33,15 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import com.google.auth.oauth2.GoogleCredentials;
 import java.io.FileInputStream;
 import com.google.api.core.ApiFuture;
 import java.io.IOException;
+
+import com.google.auth.oauth2.GoogleCredentials;
+
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.cloud.FirestoreClient;
+import com.google.firebase.FirebaseOptions;
 
 import com.google.cloud.firestore.WriteResult;
 
@@ -68,10 +73,11 @@ public class FirestoreSession  {
 
       FileInputStream serviceAccount = 
         new FileInputStream("/Users/rc/workspace/polyback/serviceAccountKey.json");
-      firestore = FirestoreOptions.getDefaultInstance().toBuilder()
-          .setProjectId("strong-imagery-341902")
-          .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-          .build().getService();
+      FirebaseOptions options = new FirebaseOptions.Builder()
+        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+        .build();
+      FirebaseApp.initializeApp(options);
+      firestore = FirestoreClient.getFirestore();
       sessions = firestore.collection("sessions");
   }
 
