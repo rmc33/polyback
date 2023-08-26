@@ -5,10 +5,10 @@ package com.rmc33.polybook.actions;
 import java.io.IOException;
 import java.util.Random;
 import java.util.logging.Logger;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.rmc33.polybook.models.SessionResponse;
 import com.rmc33.polybook.service.FirestoreSession;
