@@ -77,7 +77,6 @@ public class FirestoreSession  {
 
     GoogleCredentials sourceCredentials = GoogleCredentials.getApplicationDefault();
     sourceCredentials.refreshIfExpired();
-    AccessToken t = sourceCredentials.getAccessToken();
     ImpersonatedCredentials credentials =
         ImpersonatedCredentials.create(
             sourceCredentials,
@@ -87,7 +86,6 @@ public class FirestoreSession  {
               "https://www.googleapis.com/auth/datastore"),
             1000);
     credentials.refreshIfExpired();
-    AccessToken token = credentials.getAccessToken();
     FirebaseOptions options = new FirebaseOptions.Builder()
         .setCredentials(credentials)
         .setProjectId("strong-imagery-341902")
