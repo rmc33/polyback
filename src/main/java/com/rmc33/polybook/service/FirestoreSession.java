@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import com.google.cloud.firestore.DocumentReference;
 import java.util.logging.Logger;
@@ -38,6 +39,8 @@ import com.google.api.core.ApiFuture;
 import java.io.IOException;
 
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.ImpersonatedCredentials;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.cloud.FirestoreClient;
@@ -64,6 +67,7 @@ public class FirestoreSession  {
       }
       catch(Exception e) {
         logger.info("failed to create firesession instance: " + e);
+        e.printStackTrace();
       }
     }
     return instance;
@@ -71,14 +75,26 @@ public class FirestoreSession  {
 
   public void init() throws InterruptedException, ExecutionException, IOException {
 
-      FileInputStream serviceAccount = 
-        new FileInputStream("/Users/rc/workspace/polyback/serviceAccountKey.json");
-      FirebaseOptions options = new FirebaseOptions.Builder()
-        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+    GoogleCredentials sourceCredentials = GoogleCredentials.getApplicationDefault();
+    sourceCredentials.refreshIfExpired();
+    AccessToken t = sourceCredentials.getAccessToken();
+    ImpersonatedCredentials credentials =
+        ImpersonatedCredentials.create(
+            sourceCredentials,
+            "firebase-adminsdk-wpl4a@strong-imagery-341902.iam.gserviceaccount.com",
+            null,
+            Arrays.asList("https://www.googleapis.com/auth/cloud-platform", 
+              "https://www.googleapis.com/auth/datastore"),
+            1000);
+    credentials.refreshIfExpired();
+    AccessToken token = credentials.getAccessToken();
+    FirebaseOptions options = new FirebaseOptions.Builder()
+        .setCredentials(credentials)
+        .setProjectId("strong-imagery-341902")
         .build();
-      FirebaseApp.initializeApp(options);
-      firestore = FirestoreClient.getFirestore();
-      sessions = firestore.collection("sessions");
+    FirebaseApp.initializeApp(options);
+    firestore = FirestoreClient.getFirestore();
+    sessions = firestore.collection("sessions");
   }
 
   public String createSession(String userId)
