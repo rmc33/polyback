@@ -76,7 +76,6 @@ public class FirestoreSession  {
   public void init() throws InterruptedException, ExecutionException, IOException {
 
     GoogleCredentials sourceCredentials = GoogleCredentials.getApplicationDefault();
-    sourceCredentials.refreshIfExpired();
     ImpersonatedCredentials credentials =
         ImpersonatedCredentials.create(
             sourceCredentials,
@@ -105,7 +104,7 @@ public class FirestoreSession  {
     sessionMap.put("userId", userId);
     sessionMap.put("lastModified", dtf.format(today));
     logger.info("Saving data to " + sessionNum + " for userId:" + userId);
-    ApiFuture<WriteResult> future = sessions.document(sessionNum).set(sessionMap);
+    WriteResult result = sessions.document(sessionNum).set(sessionMap).get();
     return sessionNum;
   }
 
@@ -121,7 +120,8 @@ public class FirestoreSession  {
     return data;
   }
 
-  public void updateUserData(String sessionUserId, String userData) {
+  public void updateUserData(String sessionUserId, String userData) 
+    throws ExecutionException, InterruptedException {
     Map<String, Object> data = new HashMap<>();
     Date today = Calendar.getInstance().getTime();
     data.put("userdata", userData);
