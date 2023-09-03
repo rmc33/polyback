@@ -97,8 +97,8 @@ public class FirestoreSession  {
   public String createSession(String userId)
       throws IOException, ExecutionException, InterruptedException {
 
-    String sessionNum = new BigInteger(130, new SecureRandom()).toString(32);
     Date today = Calendar.getInstance().getTime();
+    String sessionNum = new BigInteger(130, new SecureRandom()).toString(32) + "_" + today.getTime();
     Map<String, Object> sessionMap = new HashMap<>();
     sessionMap.put("sessionNum", sessionNum);
     sessionMap.put("userId", userId);
@@ -107,7 +107,6 @@ public class FirestoreSession  {
     WriteResult result = sessions.document(sessionNum).set(sessionMap).get();
     return sessionNum;
   }
-
 
   public Map<String, Object> loadSessionNum(String sessionNum)
       throws ExecutionException, InterruptedException {

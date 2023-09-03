@@ -16,19 +16,52 @@ import com.rmc33.polybook.service.AppleIDService;
 import com.rmc33.polybook.service.GoogleIDService;
 import com.rmc33.polybook.service.IDService;
 import com.google.gson.Gson;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import java.util.regex.MatchResult;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet(
     name = "SessionServlet",
-    urlPatterns = {"/session"})
+    urlPatterns = {"/session/*"})
 public class SessionServlet extends HttpServlet {
   private static final Logger logger = Logger.getLogger(SessionServlet.class.getName());
   private static final FirestoreSession firestoreSesion = FirestoreSession.getInstance();
   private static final Gson gson = new Gson();
-
+  Pattern resourcePattern = Pattern.compile("/(.*_\\d+)");
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    processRequest(req, resp);
+    String pathInfo = req.getPathInfo();
+    if (pathInfo == null) {
+        processRequest(req, resp);
+        return;
+    }
+    Matcher matcher = resourcePattern.matcher(pathInfo);
+    String sessionId = null;
+    if (matcher.find()) {
+        sessionId = matcher.group(1);
+        System.out.println("found: " + sessionId);
+    }
+    processGetSessionRequest(req, resp, sessionId);
+  }
+
+  private void processGetSessionRequest(HttpServletRequest req, HttpServletResponse resp, String sessionId) throws IOException {
+    logger.info("sessionId =" + sessionId);
+    String sessionNum = null;
+    if (sessionId != null) {
+        try {
+            Map<String,Object> sessionData = firestoreSesion.loadSessionNum(sessionId);
+            sessionNum = (String) sessionData.get("sessionNum");
+        } catch (Exception e) {
+            logger.info("firestoreSesion getSession error:" + e);
+        }
+        SessionResponse sessionResponse = new SessionResponse();
+        sessionResponse.setSessionNum(sessionNum);
+        logger.info("Writing response " + req.toString());
+        resp.getWriter().write(gson.toJson(sessionResponse));
+    }
   }
 
   @Override

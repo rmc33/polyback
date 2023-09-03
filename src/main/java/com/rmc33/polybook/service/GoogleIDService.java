@@ -17,14 +17,13 @@ public class GoogleIDService  implements IDService {
 
         JsonFactory jsonFactory = new GsonFactory();
         NetHttpTransport transport = new NetHttpTransport();
+        //https://www.googleapis.com/oauth2/v2/tokeninfo?id_token=
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-            // Specify the CLIENT_ID of the app that accesses the backend:
-            //https://console.cloud.google.com/apis/credentials/oauthclient/
+            // Specify the CLIENT_ID of the app that accesses the backend
             .setAudience(Collections.singletonList("824870600508-f3hqh05m2kujcicp4iq916lpbr1ds84p.apps.googleusercontent.com"))
             // Or, if multiple clients access the backend:
             //.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
             .build();
-
         // (Receive idTokenString by HTTPS POST)
         try {
             GoogleIdToken token = verifier.verify(idToken);
