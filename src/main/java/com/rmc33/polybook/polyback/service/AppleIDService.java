@@ -1,4 +1,4 @@
-package com.rmc33.polybook.service;
+package com.rmc33.polybook.polyback.service;
 
 import java.util.logging.Logger;
 

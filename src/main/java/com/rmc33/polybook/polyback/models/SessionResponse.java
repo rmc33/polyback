@@ -1,4 +1,4 @@
-package com.rmc33.polybook.models;
+package com.rmc33.polybook.polyback.models;
 
 public class SessionResponse {
 	

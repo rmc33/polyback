@@ -1,14 +1,10 @@
 
 
-package com.rmc33.polybook.service;
+package com.rmc33.polybook.polyback.service;
 
-import com.rmc33.polybook.actions.SessionServlet;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
 import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -16,37 +12,19 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
-import com.google.cloud.firestore.DocumentReference;
 import java.util.logging.Logger;
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import java.io.FileInputStream;
-import com.google.api.core.ApiFuture;
-import java.io.IOException;
+
 
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.ImpersonatedCredentials;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.firebase.FirebaseOptions;
-
-import com.google.cloud.firestore.WriteResult;
 
 public class FirestoreSession  {
   private static final SimpleDateFormat dtf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
@@ -104,7 +82,7 @@ public class FirestoreSession  {
     sessionMap.put("userId", userId);
     sessionMap.put("lastModified", dtf.format(today));
     logger.info("Saving data to " + sessionNum + " for userId:" + userId);
-    WriteResult result = sessions.document(sessionNum).set(sessionMap).get();
+    sessions.document(sessionNum).set(sessionMap).get();
     return sessionNum;
   }
 
@@ -126,6 +104,16 @@ public class FirestoreSession  {
     data.put("userdata", userData);
     data.put("lastModified", dtf.format(today));
     firestore.collection("userdata").document(sessionUserId).set(data);
+  }
+
+  public Map<String, Object> getUserData(String sessionUserId) 
+    throws ExecutionException, InterruptedException {
+    DocumentSnapshot userdata = firestore.collection("userdata").document(sessionUserId).get().get();
+    Map<String, Object> data = userdata.getData();
+    if (data == null) {
+      data = Maps.newHashMap();
+    }
+    return data;
   }
 
 }
