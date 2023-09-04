@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import org.jose4j.jwk.HttpsJwks;
 import org.jose4j.jwt.JwtClaims;
+import org.jose4j.jwt.NumericDate;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver;
@@ -25,11 +26,13 @@ public class AppleIDService implements IDService {
         
         try {
             JwtClaims jwtClaims = jwtConsumer.processToClaims(idToken);
+            NumericDate expirationDate = jwtClaims.getExpirationTime();
+            expirationDate.addSeconds(5000);
+            return expirationDate.isAfter(NumericDate.now());
         } catch (Exception e) {
             logger.info(String.format("exception %s", e));
             logger.info(String.format("tokenId not verified %s", idToken));
-            return false;
         }
-        return true;
+        return false;
     }
 }

@@ -44,7 +44,7 @@ public class FirestoreSession  {
         instance.init();
       }
       catch(Exception e) {
-        logger.info("failed to create firesession instance: " + e);
+        logger.info("failed to create FirestoreSession instance: " + e);
         e.printStackTrace();
       }
     }
@@ -97,7 +97,7 @@ public class FirestoreSession  {
     return data;
   }
 
-  public void updateUserData(String sessionUserId, String userData) 
+  public void updateUserData(String sessionUserId, String userData)
     throws ExecutionException, InterruptedException {
     Map<String, Object> data = new HashMap<>();
     Date today = Calendar.getInstance().getTime();
@@ -106,7 +106,7 @@ public class FirestoreSession  {
     firestore.collection("userdata").document(sessionUserId).set(data);
   }
 
-  public Map<String, Object> getUserData(String sessionUserId) 
+  public Map<String, Object> loadUserData(String sessionUserId)
     throws ExecutionException, InterruptedException {
     DocumentSnapshot userdata = firestore.collection("userdata").document(sessionUserId).get().get();
     Map<String, Object> data = userdata.getData();

@@ -21,6 +21,7 @@ public class GoogleIDService  implements IDService {
             .setAudience(Collections.singletonList("824870600508-f3hqh05m2kujcicp4iq916lpbr1ds84p.apps.googleusercontent.com"))
             // Or, if multiple clients access the backend:
             //.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
+                .setAcceptableTimeSkewSeconds(5000)
             .build();
         // (Receive idTokenString by HTTPS POST)
         try {

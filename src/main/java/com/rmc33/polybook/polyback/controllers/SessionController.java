@@ -27,7 +27,7 @@ import java.util.Map;
 @RequestMapping("/session")
 public class SessionController {
   private static final Logger logger = Logger.getLogger(SessionController.class.getName());
-  private static final FirestoreSession firestoreSesion = FirestoreSession.getInstance();
+  private static final FirestoreSession firestoreSession = FirestoreSession.getInstance();
   Pattern resourcePattern = Pattern.compile(".*_\\d+");
 
   @GetMapping(value="/{sessionId}", produces = "application/json")
@@ -39,7 +39,7 @@ public class SessionController {
         sessionId = matcher.group(0);
         System.out.println("found: " + sessionId);
         try {
-            Map<String,Object> sessionData = firestoreSesion.loadSessionNum(sessionId);
+            Map<String,Object> sessionData = firestoreSession.loadSessionNum(sessionId);
             String sessionNum = (String) sessionData.get("sessionNum");
             sessionResponse.setSessionNum(sessionNum);
         } catch (Exception e) {
@@ -87,7 +87,7 @@ public class SessionController {
             logger.info("id error");
             return sessionResponse;
         }
-        sessionNum = firestoreSesion.createSession(req.getUserId());
+        sessionNum = firestoreSession.createSession(req.getUserId());
     } catch (Exception e) {
         logger.info("firestoreSesion error:" + e);
     }

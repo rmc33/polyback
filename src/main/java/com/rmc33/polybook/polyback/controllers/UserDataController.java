@@ -48,7 +48,7 @@ public class UserDataController  {
         sessionData = firestoreSesion.loadSessionNum(req.getSessionNum());
         String sessionUserId = (String) sessionData.get("userId");
         if (sessionUserId != null) {
-            firestoreSesion.updateUserData(sessionUserId, sessionUserId);
+            firestoreSesion.updateUserData(sessionUserId, req.getUserData());
         }
         else {
             logger.info("session invalid");
@@ -59,24 +59,26 @@ public class UserDataController  {
         return userDataResponse;
     }
     logger.info("sessionData:" + sessionData);
-    userDataResponse.setUserData((String) sessionData.get("userData"));
+    userDataResponse.setUserData(req.getUserData());
     return userDataResponse;
   }
 
-  @GetMapping(name="/{sessionUserId}", produces = "application/json")
-  public UserDataResponse getRequest(@PathVariable String sessionUserId) throws IOException {
-    logger.info("sessionUserId =" + sessionUserId);
-    Matcher matcher = resourcePattern.matcher(sessionUserId);
+  @GetMapping(value="/{sessionId}", produces = "application/json")
+  public UserDataResponse getRequest(@PathVariable String sessionId) throws IOException {
+    logger.info("sessionId =" + sessionId);
+    Matcher matcher = resourcePattern.matcher(sessionId);
     UserDataResponse userDataResponse = new UserDataResponse();
     if (matcher.find()) {
-      sessionUserId = matcher.group(0);
-        System.out.println("found: " + sessionUserId);
+        sessionId = matcher.group(0);
+        System.out.println("found: " + sessionId);
         try {
-            Map<String,Object> data = firestoreSesion.loadSessionNum(sessionUserId);
-            String userData = (String) data.get("userData");
+            Map<String,Object> data = firestoreSesion.loadSessionNum(sessionId);
+            String sessionUserId = (String) data.get("userId");
+            data = firestoreSesion.loadUserData(sessionUserId);
+            String userData = (String) data.get("userdata");
             userDataResponse.setUserData(userData);
         } catch (Exception e) {
-            logger.info("firestoreSesion getUserData error:" + e);
+            logger.info("firestoreSesion loadUserData error:" + e);
         }
     }
     return userDataResponse;
