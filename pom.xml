@@ -28,7 +28,7 @@ Copyright 2019 Google LLC
 
   <groupId>com.rmc33.polybook</groupId>
   <artifactId>polyback</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
 
 
   <properties>

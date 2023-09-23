@@ -51,7 +51,6 @@ public class SessionController {
 
   @PostMapping(produces = "application/json", consumes = "application/json")
   public SessionResponse sessionCreateRequest(@RequestBody SessionRequest req) throws IOException {
-
     SessionResponse sessionResponse = new SessionResponse();
 
     if (req.getUserId() == null) {
@@ -82,18 +81,17 @@ public class SessionController {
             logger.info("invalid provider");
             return sessionResponse;
         }
-        boolean verifyResult = idService.verifyIDToken(req.getIdToken(), req.getUserId());
-        if (verifyResult == false) {
+        String verifyResult = idService.verifyIDToken(req.getIdToken(), req.getUserId());
+        if (verifyResult == null) {
             logger.info("id error");
             return sessionResponse;
         }
+        sessionResponse.setEmail(verifyResult);
         sessionNum = firestoreSession.createSession(req.getUserId());
     } catch (Exception e) {
         logger.info("firestoreSesion error:" + e);
     }
-
     sessionResponse.setSessionNum(sessionNum);
-
     logger.info("Writing response " + req.toString());
     return sessionResponse;
   }

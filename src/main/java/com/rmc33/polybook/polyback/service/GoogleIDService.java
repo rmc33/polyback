@@ -11,7 +11,7 @@ public class GoogleIDService  implements IDService {
 
     private static final Logger logger = Logger.getLogger(GoogleIDService.class.getName());
 
-    public boolean verifyIDToken(String idToken, String userId) {
+    public String verifyIDToken(String idToken, String userId) {
 
         JsonFactory jsonFactory = new GsonFactory();
         NetHttpTransport transport = new NetHttpTransport();
@@ -27,13 +27,13 @@ public class GoogleIDService  implements IDService {
         try {
             GoogleIdToken token = verifier.verify(idToken);
             if (token != null) {
-                return true;
+                return token.getPayload().getEmail();
             }
         }
         catch (Exception e) {
             logger.info(String.format("exception %s", e));
         }
         logger.info(String.format("tokenId not verified %s", idToken));
-        return false;
+        return null;
     }
 }
