@@ -2,4 +2,4 @@
 
 mvn clean package jib:build
 
-gcloud beta run deploy polyback --image gcr.io/strong-imagery-341902/polyback --platform managed --region us-central1 --memory 512M
+gcloud beta run deploy {projectname} --image gcr.io/{gcp name}/{project name} --platform managed --region us-central1 --memory 512M

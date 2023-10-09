@@ -21,7 +21,7 @@ public class AppleIDService implements IDService {
         JwtConsumer jwtConsumer = new JwtConsumerBuilder()
                 .setVerificationKeyResolver(httpsJwksKeyResolver)
                 .setExpectedIssuer("https://appleid.apple.com")
-                .setExpectedAudience("org.reactjs.native.example.BibleLingo")
+                .setExpectedAudience("org.reactjs.native.example.BibleLingo", "com.biblelingoapp.BibleLingo")
                 .build();
         
         try {
